@@ -1,6 +1,6 @@
 import { auth, db } from "./firebase.js";
 import { signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-auth.js";
-import { collection, addDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore.js";
+import { collection, addDoc, onSnapshot, query, where } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore.js";
 
 // Select Elements
 const logoutBtn = document.getElementById("logoutBtn");
@@ -15,10 +15,10 @@ const transactionTable = document.getElementById("transactionTable");
 onAuthStateChanged(auth, (user) => {
     if (user) {
         logoutBtn.style.display = "block"; // Show Logout Button
-        fetchTransactions(); // Fetch transactions if logged in
+        fetchTransactions(user.uid); // Fetch user-specific transactions
     } else {
         logoutBtn.style.display = "none"; // Hide Logout Button
-        window.location.href = "signin.html"; // Redirect to Sign In if not logged in
+        window.location.href = "signin.html"; // Redirect to Sign In
     }
 });
 
@@ -33,10 +33,11 @@ logoutBtn.addEventListener("click", () => {
 });
 
 // Fetch Transactions & Update UI
-function fetchTransactions() {
+function fetchTransactions(userId) {
     const transactionsRef = collection(db, "transactions");
+    const userTransactionsQuery = query(transactionsRef, where("userId", "==", userId)); // Get only user-specific transactions
 
-    onSnapshot(transactionsRef, (snapshot) => {
+    onSnapshot(userTransactionsQuery, (snapshot) => {
         let balance = 0, income = 0, expenses = 0;
         transactionTable.innerHTML = "";
 
@@ -66,8 +67,14 @@ function fetchTransactions() {
     });
 }
 
-// Add Transaction Function
+// Add Transaction Function (Associating UID)
 function addTransaction(type) {
+    const user = auth.currentUser; // Get the current logged-in user
+    if (!user) {
+        alert("You must be logged in to add transactions.");
+        return;
+    }
+
     let transactionName = prompt(`Enter ${type} Name:`);
     let transactionAmount = parseFloat(prompt(`Enter ${type} Amount:`));
 
@@ -77,16 +84,16 @@ function addTransaction(type) {
     }
 
     addDoc(collection(db, "transactions"), {
+        userId: user.uid, // Store the user's UID with the transaction
         name: transactionName,
         amount: transactionAmount,
         type: type,
         date: new Date().toISOString()
     })
     .then(() => alert(`${type} Added Successfully!`))
-    .catch(error => alert("Error adding transaction:", error));
+    .catch(error => alert("Error adding transaction: " + error.message));
 }
 
 // Attach Event Listeners
 addIncomeBtn.addEventListener("click", () => addTransaction("Income"));
 addExpenseBtn.addEventListener("click", () => addTransaction("Expense"));
-
