@@ -115,3 +115,55 @@ function addTransaction(type) {
 // Attach Event Listeners
 addIncomeBtn.addEventListener("click", () => addTransaction("Income"));
 addExpenseBtn.addEventListener("click", () => addTransaction("Expense"));
+
+const API_KEY = "AIzaSyDyMCEs84dSfMJaUIvPiYp-1ovBivxF6n0";
+
+document.getElementById("openChat").addEventListener("click", () => {
+    document.querySelector(".chat-container").style.display = "flex";
+});
+
+document.getElementById("closeChat").addEventListener("click", () => {
+    document.querySelector(".chat-container").style.display = "none";
+});
+
+document.getElementById("sendBtn").addEventListener("click", sendMessage);
+document.getElementById("userInput").addEventListener("keypress", (e) => {
+    if (e.key === "Enter") sendMessage();
+});
+
+async function sendMessage() {
+    const inputField = document.getElementById("userInput");
+    const message = inputField.value.trim();
+    if (!message) return;
+
+    appendMessage(message, "user-message");
+    inputField.value = "";
+
+    const response = await getAIResponse(message);
+    appendMessage(response, "bot-message");
+}
+
+function appendMessage(text, className) {
+    const chatBox = document.getElementById("chatBox");
+    const messageElement = document.createElement("p");
+    messageElement.className = className;
+    messageElement.textContent = text;
+    chatBox.appendChild(messageElement);
+    chatBox.scrollTop = chatBox.scrollHeight;
+}
+
+async function getAIResponse(userInput) {
+    try {
+        const response = await fetch("https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:generateText?key=" + API_KEY, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ prompt: { text: userInput } })
+        });
+
+        const data = await response.json();
+        return data.candidates[0]?.output || "Sorry, I couldn't understand that.";
+    } catch (error) {
+        console.error("Error fetching response:", error);
+        return "Error connecting to AI service.";
+    }
+}

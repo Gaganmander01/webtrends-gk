@@ -51,6 +51,22 @@
         <tbody id="transactionTable"></tbody>
     </table>
 
+    <div class="chat-container">
+        <div class="chat-header">
+            <h2><i class="fas fa-robot"></i> Budget Assistant</h2>
+            <button id="closeChat">&times;</button>
+        </div>
+        <div class="chat-box" id="chatBox">
+            <p class="bot-message">Hello! Ask me anything about your budget.</p>
+        </div>
+        <div class="chat-input">
+            <input type="text" id="userInput" placeholder="Type a message...">
+            <button id="sendBtn"><i class="fas fa-paper-plane"></i></button>
+        </div>
+    </div>
+    <button id="openChat"><i class="fas fa-comments"></i> Chat</button>
+    
+
     <script type="module" src="firebase.js"></script>
     <script type="module" src="script.js"></script>
 </body>
