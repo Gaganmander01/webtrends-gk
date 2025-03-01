@@ -32,17 +32,27 @@ logoutBtn.addEventListener("click", () => {
         .catch(error => alert(error.message));
 });
 
-// Fetch Transactions & Update UI
+// Fetch Transactions & Update UI with Filtering
 function fetchTransactions(userId) {
     const transactionsRef = collection(db, "transactions");
-    const userTransactionsQuery = query(transactionsRef, where("userId", "==", userId)); // Get only user-specific transactions
+    const userTransactionsQuery = query(transactionsRef, where("userId", "==", userId));
 
     onSnapshot(userTransactionsQuery, (snapshot) => {
-        let balance = 0, income = 0, expenses = 0;
-        transactionTable.innerHTML = "";
+        let transactions = [];
+        snapshot.forEach((doc) => transactions.push(doc.data()));
 
-        snapshot.forEach((doc) => {
-            const transaction = doc.data();
+        updateTransactionTable(transactions); // Call function to display transactions
+    });
+}
+
+// Function to Update Table Based on Selected Filter
+function updateTransactionTable(transactions) {
+    const filterType = document.getElementById("filterType").value; // Get selected filter
+    let balance = 0, income = 0, expenses = 0;
+    transactionTable.innerHTML = "";
+
+    transactions.forEach(transaction => {
+        if (filterType === "All" || transaction.type === filterType) { 
             let row = `
                 <tr>
                     <td>${transaction.name}</td>
@@ -52,20 +62,28 @@ function fetchTransactions(userId) {
                 </tr>
             `;
             transactionTable.innerHTML += row;
+        }
 
-            if (transaction.type === "Income") {
-                income += transaction.amount;
-            } else {
-                expenses += transaction.amount;
-            }
-        });
-
-        balance = income - expenses;
-        balanceAmount.textContent = `$${balance}`;
-        incomeAmount.textContent = `$${income}`;
-        expenseAmount.textContent = `$${expenses}`;
+        if (transaction.type === "Income") {
+            income += transaction.amount;
+        } else {
+            expenses += transaction.amount;
+        }
     });
+
+    balance = income - expenses;
+    balanceAmount.textContent = `$${balance}`;
+    incomeAmount.textContent = `$${income}`;
+    expenseAmount.textContent = `$${expenses}`;
 }
+
+// Event Listener for Filter Change
+document.getElementById("filterType").addEventListener("change", () => {
+    onAuthStateChanged(auth, (user) => {
+        if (user) fetchTransactions(user.uid);
+    });
+});
+
 
 // Add Transaction Function (Associating UID)
 function addTransaction(type) {

@@ -9,6 +9,7 @@
 body {
     background-color: #f4f4f4;
     text-align: center;
+    padding: 0;
 }
 
 /* Header */
@@ -19,6 +20,7 @@ header {
     display: flex;
     justify-content: space-between;
     align-items: center;
+    flex-wrap: wrap;
 }
 
 header h1 {
@@ -66,13 +68,65 @@ nav a:hover, button:hover {
     border-radius: 10px;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
     text-align: center;
-    width: 250px;
+    width: 100%;
+    max-width: 250px;
 }
 
-.balance-card h2 {
-    font-size: 1.2rem;
-    margin-bottom: 10px;
-    color: #007bff;
+/* Filter Dropdown */
+.filter-container {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 16px;
+    right: 20px;
+    top: 80px;
+    margin-left: 10px;
+}
+
+.filter-container label {
+    font-weight: bold;
+    color: #333;
+}
+
+#filterType {
+    padding: 8px 12px;
+    font-size: 16px;
+    border: 2px solid #333;
+    border-radius: 6px;
+    background: #fff;
+    cursor: pointer;
+    outline: none;
+    transition: all 0.3s ease;
+}
+
+#filterType:hover {
+    border-color: #388E3C;
+}
+
+#filterType:focus {
+    box-shadow: 0 0 5px rgba(76, 175, 80, 0.7);
+}
+
+/* Dashboard */
+.dashboard {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    margin: 20px;
+    padding: 0 10%;
+}
+
+.card {
+    background: white;
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    text-align: center;
+    flex: 1;
+    margin: 10px;
+    min-width: 200px;
+    max-width: 300px;
 }
 
 #balanceAmount, #incomeAmount, #expenseAmount {
@@ -81,6 +135,7 @@ nav a:hover, button:hover {
     margin-top: 10px;
 }
 
+/* Buttons */
 button {
     margin-top: 10px;
     background-color: #007bff;
@@ -141,12 +196,13 @@ th {
 .login-container {
     background-color: white;
     padding: 30px;
-    width: 350px;
+    width: 90%;
+    max-width: 350px;
     border-radius: 10px;
     box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.2);
     text-align: center;
     margin: auto;
-    margin-top: 100px;
+    margin-top: 50px;
 }
 
 .login-container h2 {
@@ -197,18 +253,59 @@ th {
 }
 
 /* Responsive Design */
-@media (max-width: 400px) {
-    .login-container {
-        width: 90%;
+@media (max-width: 1024px) {
+    .dashboard {
+        padding: 0 5%;
     }
+
+    .filter-container {
+        position: static;
+        margin: 10px auto;
+        justify-content: center;
+    }
+}
+
+@media (max-width: 768px) {
+    header {
+        flex-direction: column;
+        text-align: center;
+    }
+
+    .dashboard {
+        flex-direction: column;
+        align-items: center;
+    }
+
+    .card {
+        width: 80%;
+        margin-bottom: 15px;
+    }
+
+    .transactions {
+        width: 100%;
+    }
+
+    table {
+        font-size: 0.9rem;
+    }
+}
+
+@media (max-width: 500px) {
     .balance-section {
         flex-direction: column;
         align-items: center;
     }
+
+    .filter-container {
+        flex-direction: column;
+        align-items: center;
+    }
+
     .transactions {
         width: 100%;
     }
+
     table {
-        font-size: 0.9rem;
+        font-size: 0.8rem;
     }
 }
